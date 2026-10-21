@@ -14,7 +14,7 @@ TOTAL=4
 # API_KEY is a weak, hardcoded obstacle (security by obscurity), not real
 # access control — it only stops casual copy/rename, nothing more.
 API_BASE="https://riracloud.my.id/api/media-converter-cli"
-API_KEY="REPLACE_WITH_SECRET_KEY"
+API_KEY="950d1628d56fbc1b7ffc0c64ed4032d9c4a72563441e3c41fd8d949a9395ee5a"
 REPO_URL="https://github.com/pembri/media-converter-cli"
 
 if [ -t 1 ]; then
