@@ -10,9 +10,6 @@ RECORD="$HOME/.media-converter"
 SRC_DIR="$(cd "$(dirname "$0")" && pwd)"
 TOTAL=4
 
-# API endpoint that serves the compiled media-converter binary.
-# API_KEY is a weak, hardcoded obstacle (security by obscurity), not real
-# access control — it only stops casual copy/rename, nothing more.
 API_BASE="https://riracloud.my.id/api/media-converter-cli"
 API_KEY="950d1628d56fbc1b7ffc0c64ed4032d9c4a72563441e3c41fd8d949a9395ee5a"
 REPO_URL="https://github.com/pembri/media-converter-cli"
@@ -40,17 +37,16 @@ step 1 "Checking environment"
 [ -d "$PREFIX/bin" ] && command -v pkg >/dev/null 2>&1 || die "This installer is for Termux only."
 ok "Termux detected"
 
-# 2. Packages
-step 2 "Installing packages (python, ffmpeg)"
-apt-get update >/dev/null 2>&1 || warn "Package list update failed, trying anyway"
+# 2. Preparing environment (quiet: no raw package manager output)
+step 2 "Preparing environment"
+apt-get update >/dev/null 2>&1
 NEW_PKGS=""
 command -v python3 >/dev/null 2>&1 || NEW_PKGS="$NEW_PKGS python"
 command -v ffmpeg >/dev/null 2>&1 || NEW_PKGS="$NEW_PKGS ffmpeg"
-pkg install -y python ffmpeg || die "Could not install python/ffmpeg. Check your internet connection and try again."
-command -v python3 >/dev/null 2>&1 || die "python3 not found after install."
-command -v ffmpeg >/dev/null 2>&1 || die "ffmpeg not found after install."
-ok "python $(python3 --version 2>&1 | cut -d' ' -f2)"
-ok "ffmpeg $(ffmpeg -version 2>/dev/null | head -1 | cut -d' ' -f3)"
+pkg install -y python ffmpeg >/dev/null 2>&1 || die "Could not prepare the environment. Check your internet connection and try again."
+command -v python3 >/dev/null 2>&1 || die "Could not prepare the environment. Check your internet connection and try again."
+command -v ffmpeg >/dev/null 2>&1 || die "Could not prepare the environment. Check your internet connection and try again."
+ok "Environment ready"
 
 # 3. Storage
 step 3 "Checking storage access"
@@ -101,9 +97,6 @@ if [ -n "$FOUND" ] && [ "$FOUND" != "$BIN" ]; then
 fi
 ok "Installed: $BIN ${REMOTE_VERSION:+($REMOTE_VERSION)}"
 
-# Clean up the cloned repo folder — install.sh and README are no longer
-# needed once media-converter is installed. Only removes it if this really
-# looks like a git clone, never an arbitrary directory the user ran this from.
 if [ -d "$SRC_DIR/.git" ] && [ "$(basename "$SRC_DIR")" = "media-converter-cli" ]; then
   cd "$HOME" 2>/dev/null && rm -rf "$SRC_DIR" 2>/dev/null
 fi
