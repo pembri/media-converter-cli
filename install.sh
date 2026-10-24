@@ -14,10 +14,46 @@ API_KEY="950d1628d56fbc1b7ffc0c64ed4032d9c4a72563441e3c41fd8d949a9395ee5a"
 REPO_URL="https://github.com/pembri/media-converter-cli"
 
 if [ -t 1 ]; then
-  C_B=$'\033[1;36m'; C_G=$'\033[32m'; C_R=$'\033[31m'; C_0=$'\033[0m'
+  C_B=$'\033[1;36m'; C_W=$'\033[1;37m'; C_D=$'\033[2m'
+  C_G=$'\033[32m'; C_R=$'\033[31m'; C_0=$'\033[0m'
 else
-  C_B=""; C_G=""; C_R=""; C_0=""
+  C_B=""; C_W=""; C_D=""; C_G=""; C_R=""; C_0=""
 fi
+
+clear_screen() { [ -t 1 ] && printf '\033[2J\033[3J\033[H'; }
+
+print_header() {
+  local title="Media Converter"
+  local subtitle="Convert Audio, Video & Images"
+  local dev_label="Developed" dev_value="Rira Project"
+  local gh_label="Github" gh_value="$REPO_URL"
+  local w=0 l
+  for l in "$title" "$subtitle" "${dev_label} : ${dev_value}" "${gh_label} : ${gh_value}"; do
+    [ ${#l} -gt "$w" ] && w=${#l}
+  done
+  w=$(( w + 4 ))
+
+  local line; line=$(printf '═%.0s' $(seq 1 "$w"))
+  printf '%s╔%s╗%s\n' "$C_B" "$line" "$C_0"
+
+  local pad left right
+  pad=$(( w - ${#title} )); left=$(( pad / 2 )); right=$(( pad - left ))
+  printf '%s║%s%*s%s%s%s%*s%s║%s\n' "$C_B" "$C_0" "$left" '' "$C_W" "$title" "$C_0" "$right" '' "$C_B" "$C_0"
+
+  pad=$(( w - ${#subtitle} )); left=$(( pad / 2 )); right=$(( pad - left ))
+  printf '%s║%s%*s%s%s%s%*s%s║%s\n' "$C_B" "$C_0" "$left" '' "$C_D" "$subtitle" "$C_0" "$right" '' "$C_B" "$C_0"
+
+  local text pad2
+  text="${dev_label} : ${dev_value}"
+  pad2=$(( w - ${#text} - 1 ))
+  printf '%s║%s%*s%s%s%s : %s%s%s %s║%s\n' "$C_B" "$C_0" "$pad2" '' "$C_D" "$dev_label" "$C_0" "$C_W" "$dev_value" "$C_0" "$C_B" "$C_0"
+
+  text="${gh_label} : ${gh_value}"
+  pad2=$(( w - ${#text} - 1 ))
+  printf '%s║%s%*s%s%s%s : %s%s%s %s║%s\n' "$C_B" "$C_0" "$pad2" '' "$C_D" "$gh_label" "$C_0" "$C_W" "$gh_value" "$C_0" "$C_B" "$C_0"
+
+  printf '%s╚%s╝%s\n' "$C_B" "$line" "$C_0"
+}
 
 WIDTH=30
 STATE_DIR="$(mktemp -d)"
@@ -88,10 +124,8 @@ run_step() {
   return $rc
 }
 
-LINE=$(printf '═%.0s' $(seq 1 37))
-printf '%s╔%s╗\n' "$C_B" "$LINE"
-printf '║   Media Converter by Rira Project   ║\n'
-printf '╚%s╝%s\n' "$LINE" "$C_0"
+clear_screen
+print_header
 echo
 
 render 0 "Checking environment"
